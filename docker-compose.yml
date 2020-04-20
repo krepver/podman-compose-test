@@ -1,0 +1,37 @@
+version: 2
+
+services:
+  db:
+    image: postgres:12
+    environment:
+      PGDATA: /var/lib/postgresql/data
+      POSTGRES_PASSWORD: root
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+
+  nginx:
+    image: nginx
+    ports:
+      - 8080:80
+    volumes:
+      - ./app:/app:Z
+      - ./nginx/my.conf:/etc/nginx/conf.d/default.conf:z
+    depends_on:
+      - db
+      - php
+
+  php:
+    build: ./web_php_base_7
+    image: web_php_base_7
+    ports:
+      - 9000:9000
+    volumes:
+      - ./app:/app:Z
+    depends_on:
+      - db
+
+
+volumes:
+  db_data:
